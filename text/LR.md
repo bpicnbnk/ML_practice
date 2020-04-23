@@ -96,10 +96,10 @@ $$\underset{f\in F}{min}\, \frac{1}{n}\sum^{n}_{i=1}L(y_i,f(x_i))+\lambda J(F)$$
 ### 1、梯度下降法
 
 设定初始参数$\theta$,不断迭代，使得$J(\theta)$最小化：
-$$\theta_j:=\theta_j-\alpha\frac{\partial{J(\theta)}}{\partial\theta}$$
+$$\theta_j:=\theta_j-\alpha\frac{\partial{J(\theta)}}{\partial\theta_j}$$
 
 $$\begin{aligned}
-\frac{\partial{J(\theta)}}{\partial\theta} 
+\frac{\partial{J(\theta)}}{\partial\theta_j} 
 &= \frac{\partial}{\partial\theta_j}\frac{1}{2}\sum_{i=1}^{n}(f_\theta(x)^{(i)}-y^{(i)})^2 \\
 &= 2*\frac{1}{2}\sum_{i=1}^{n}(f_\theta(x)^{(i)}-y^{(i)})*\frac{\partial}{\partial\theta_j}(f_\theta(x)^{(i)}-y^{(i)}) \\
 &= \sum_{i=1}^{n}(f_\theta(x)^{(i)}-y^{(i)})*\frac{\partial}{\partial\theta_j}(\sum_{j=0}^{d}\theta_jx_j^{(i)}-y^{(i)}))\\
@@ -231,17 +231,17 @@ $$可求得，\theta_1 = \theta_0 - \frac {f(\theta_0)}{f(\theta_0)'}$$
 
 重复迭代，可以让逼近取到$f(\theta)$的最小值
 
-当我们对损失函数$l(\theta)$进行优化的时候，实际上是想要取到$l'(\theta)$的最小值，因此迭代公式为：
+当我们对损失函数$l(\theta)$进行优化的时候，实际上是想要取到$l'(\theta)$的~~最小值~~等于0时的值，因此迭代公式为：
 
 $$
 \theta :=\theta-\frac{l'(\theta)}{l''(\theta)}
 $$
 
 $$
-当\theta是向量值的时候，\theta :=\theta - H^{-1}\Delta_{\theta}l(\theta)
+当\theta是向量值的时候，\theta :=\theta - H^{-1}\nabla_{\theta}l(\theta)
 $$
 
-其中，$\Delta_{\theta}l(\theta)$是$l(\theta)$对$\theta_i$的偏导数，$H$是$J(\theta)$的海森矩阵，<br>
+其中，$\nabla_{\theta}l(\theta)$是$l(\theta)$对$\theta_i$的偏导数，$H$是$J(\theta)$的海森矩阵，<br>
 $$H_{ij} = \frac{\partial ^2l(\theta)}{\partial\theta_i\partial\theta_j}$$
 
 - 问题：请用泰勒展开法推导牛顿法公式。
