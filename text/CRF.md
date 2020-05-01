@@ -35,8 +35,7 @@
 
     -   **概率判别模型**：是对$P(Y|X)$进行建模。
 
-        例如：逻辑回归（Logistics Regression）/SoftMax
-        Regression。这类问题是对于$P(y|x)$进行建模的，利用最大熵思想（Maximum Entropy Model）驱动模型。（PS：在最大熵原则下，如果给定均值和方差，那么Gaussian Dist熵最大）
+        例如：逻辑回归（Logistics Regression）/SoftMax Regression。这类问题是对于$P(y|x)$进行建模的，利用最大熵思想（Maximum Entropy Model）驱动模型。（PS：在最大熵原则下，如果给定均值和方差，那么Gaussian Dist熵最大）
 
         -   **MEMM（Maximum Entropy Markov  Model）最大熵马尔科夫模型**。这是结合了最大熵+HMM的优点的一个模型，属于概率判别模型。概率图模型如下：
 
