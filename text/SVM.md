@@ -174,9 +174,9 @@ $$\underbrace{min}_{w,b,\xi}\; \underbrace{max}_{\alpha_i \geq 0, \mu_i \geq 0,}
 这个优化目标也满足KKT条件，也就是说，我们可以通过拉格朗日对偶将我们的优化问题转化为等价的对偶问题来求解如下：
 $$\underbrace{max}_{\alpha_i \geq 0, \mu_i \geq 0,} \; \underbrace{min}_{w,b,\xi}\; L(w,b,\alpha, \xi,\mu)$$
 
-我们可以先求优化函数对于$w, b, \xi $的极小值, 接着再求拉格朗日乘子$\alpha$和 $\mu$的极大值。
+我们可以先求优化函数对于$w, b, \xi$的极小值, 接着再求拉格朗日乘子$\alpha$和 $\mu$的极大值。
 
-首先我们来求优化函数对于$w, b, \xi $的极小值，这个可以通过求偏导数求得：
+首先我们来求优化函数对于$w, b, \xi$的极小值，这个可以通过求偏导数求得：
 $$\frac{\partial L}{\partial w} = 0 \;\Rightarrow w = \sum\limits_{i=1}^{m}\alpha_iy_ix_i $$ 
 $$\frac{\partial L}{\partial b} = 0 \;\Rightarrow \sum\limits_{i=1}^{m}\alpha_iy_i = 0$$ 
 $$\frac{\partial L}{\partial \xi} = 0 \;\Rightarrow C- \alpha_i - \mu_i = 0 $$
@@ -195,12 +195,127 @@ $$ C- \alpha_i - \mu_i = 0 $$
 $$ \alpha_i \geq 0 \;(i =1,2,...,m)$$ 
 $$ \mu_i \geq 0 \;(i =1,2,...,m)$$
 
- 对于$ C- \alpha_i - \mu_i = 0 ， \alpha_i \geq 0 ，\mu_i \geq 0 $这3个式子，我们可以消去$\mu_i$，只留下$\alpha_i$，也就是说$0 \leq \alpha_i \leq C$。 同时将优化目标函数变号，求极小值，如下：
+ 对于$C- \alpha_i - \mu_i = 0 ， \alpha_i \geq 0 ，\mu_i \geq 0$这3个式子，我们可以消去$\mu_i$，只留下$\alpha_i$，也就是说$0 \leq \alpha_i \leq C$。 同时将优化目标函数变号，求极小值，如下：
 $$ \underbrace{ min }_{\alpha}  \frac{1}{2}\sum\limits_{i=1,j=1}^{m}\alpha_i\alpha_jy_iy_jx_i^Tx_j - \sum\limits_{i=1}^{m}\alpha_i $$ 
 $$ s.t. \; \sum\limits_{i=1}^{m}\alpha_iy_i = 0 $$ 
 $$0 \leq \alpha_i \leq C$$
 
 这就是软间隔最大化时的线性可分SVM的优化目标形式，和上一篇的硬间隔最大化的线性可分SVM相比，我们仅仅是多了一个约束条件$0 \leq \alpha_i \leq C$。我们依然可以通过SMO算法来求上式极小化时对应的$\alpha$向量就可以求出$w和b$了。
+## KKT
+原始问题的拉格朗日函数为：
+$$L(w,b,\xi,\alpha,\mu) = \frac{1}{2}||w||_2^2 +C\sum\limits_{i=1}^{m}\xi_i - \sum\limits_{i=1}^{m}\alpha_i[y_i(w^Tx_i + b) - 1 + \xi_i] - \sum\limits_{i=1}^{m}\mu_i\xi_i $$
+也就是说，我们现在要优化的目标函数是：
+$$\underbrace{min}_{w,b,\xi}\; \underbrace{max}_{\alpha_i \geq 0, \mu_i \geq 0,} L(w,b,\alpha, \xi,\mu)$$
+
+这个优化目标也满足KKT条件，也就是说，我们可以通过**拉格朗日对偶**将我们的优化问题转化为等价的对偶问题来求解如下：
+$$\underbrace{max}_{\alpha_i \geq 0, \mu_i \geq 0,} \; \underbrace{min}_{w,b,\xi}\; L(w,b,\alpha, \xi,\mu)$$
+
+对偶问题拉格朗日函数的极大极小问题，得到以下等价优化问题 ：
+$$ \underbrace{ min }_{\alpha}  \frac{1}{2}\sum\limits_{i=1,j=1}^{m}\alpha_i\alpha_jy_iy_jx_i^Tx_j - \sum\limits_{i=1}^{m}\alpha_i $$ 
+$$ s.t. \; \sum\limits_{i=1}^{m}\alpha_iy_i = 0 $$ 
+$$0 \leq \alpha_i \leq C$$
+### KKT条件
+
+原始问题的解对偶问题的解相同需要满足KKT对偶互补条件，即 ：
+$$\alpha_{i}\left(y_{i}\left(w \cdot x_{i}+b\right)-1+\xi_{i}\right)=0 \tag{1}$$
+$$\mu_{i} \xi_{i}=0 \tag{2}$$
+
+对样本$x_i$，记SVM的输出结果为:
+$$u_{i}=w \cdot x_{i}+b$$
+Platt在序列最小优化（SMO）方法中提到，对正定二次优化问题（a positive definite QP problem）的优化点的充分必要条件为KKT条件（Karush-Kuhn-Tucker conditions）。
+
+对于所有的i，若满足以下条件，QP问题可解:
+$$\alpha_{i}=0 \Leftrightarrow y_{i} u_{i} \geq 1 \tag{3}$$
+$$0<\alpha_{i}<C \Leftrightarrow y_{i} u_{i}=1 \tag{4}$$
+$$\alpha_{i}=C \Leftrightarrow y_{i} u_{i} \leq 1 \tag{5}$$
+
+其中$y_iu_i$就是每个样本点的函数间隔，分离超平面(w,b)对应的函数间隔$\hat{\gamma}$取为1.
+### KKT条件的推导
+
+下面我们将要讨论如何从式(1)、(2)得到式(3) ~ (5)。
+
+(1) $\alpha_i =0$
+
+由$C - \alpha_i - \mu_i = 0$，得
+$\mu_i =C$
+
+则由式(2)可知，
+$$\xi_i = 0$$
+
+再由原始问题的约束条件$y_i (w \cdot x_i + b) \ge 1 - \xi_i$，有
+$$y_i u_i \ge 1$$
+
+(2) $0<\alpha_i<C$
+
+将$\mu_i$乘到式(1)，有
+$$\begin{aligned}
+\mu_i \alpha_i y_i u_i - \mu_i \alpha_i + \mu_i \alpha_i \xi_i= 0 \\
+\mu_i \alpha_i (y_i u_i - 1) = 0 
+\end{aligned}$$
+
+又$C - \alpha_i - \mu_i = 0$，则
+$(C - \alpha_i) \alpha_i (y_i u_i - 1) = 0$
+
+因为$0<\alpha_i<C$，所以
+$y_i u_i = 1$
+
+又由式(1)，有
+$$y_i u_i = 1 - \xi_i \Rightarrow \xi_i = 0$$
+
+(3) $\alpha_i = C$
+由式(1)，有
+$$\begin{aligned}
+& y_i u_i - 1 + \xi_i = 0 \\
+& y_i u_i = 1 - \xi_i \tag{6}
+\end{aligned}$$
+
+因为$\xi_i \ge 0$，所以
+$y_i u_i \le 1$
+
+即可得式(3) ~ (5)，KKT条件得以推导。
+
+### KKT条件的几何解释
+
+在线性不可分的情况下，将对偶问题的解$\alpha^* = (\alpha_1^*,\alpha_2^*,\cdots,\alpha_N^*)^T$中对应于$\alpha_i^* > 0$的样本点$(x_i,y_i)$称为支持向量2。
+如下图所示，分离超平面由实线表示，间隔用虚线表示，正例由“o”表示，负例由“x”表示。实例x_i到间隔边界的距离为$\dfrac{\xi_i}{\|w\|}$。
+
+![](../pic/svmsoft5.png)
+
+软间隔的支持向量$x_i$或者在间隔边界上，或者在间隔边界与分离超平面之间，或者在分离超平面误分一侧。
+这里可以从两种角度来解释，第一种角度就像李航在《统计学习方法》第113页中用到间隔边界的距离边界$\dfrac{\xi_i}{\|w\|}$。因为，$\dfrac{1-\xi_i}{\|w\|}$为样本点$x_i$到分类超平面的距离，$\dfrac{1}{\|w\|}$是分类间隔到分类超平面的距离，可以根据$\xi_i$的大小来判断分类情况。
+
+1. 若$\alpha_i^* < C$，则$\xi_i = 0$，支持向量$x_i$恰好落在间隔边界上；
+2. 若$\alpha_i^* = C$,$0 < \xi_i < 1$，则分类正确，$x_i$在间隔边界与分离超平面之间；
+3. 若$\alpha_i^* = C$,$\xi_i = 1$，则$x_i$在分离超平面上；
+4. 若$\alpha_i^* = C$,$\xi_i > 1$，则$x_i$位于分离超平面误分一侧。
+
+现在我们要从另外一种角度，也就是KKT条件（式(3)~(5)），通过数学推导来得到上面的结果。
+- 在间隔边界上
+
+由式(3)可知，当$0 < \alpha_i^* < C$时，$y_i u_i = 1$，则分类正确，且$u_i = \pm 1$，即在分类间隔边界上。
+在间隔边界与分离超平面之间
+
+当$\alpha_i^* = C$,$0 < \xi_i <1$时，由式(6)得
+$0 < y_i u_i < 1$
+
+则说明$y_i,u_i$同号，分类正确，且函数间隔小于1，即在间隔边界内。
+
+- 在分离超平面上
+
+当$\alpha_i^* = C$, $\xi_i = 1$时，由式(6)得
+$y_i u_i = 0 \Rightarrow u_i = 0$
+
+即$x_i$在分离超平面上。
+
+- 在分离超平面误分一侧
+
+当$\alpha_i^* = C$, $\xi_i > 1$时，由式(6)得
+$y_i u_i <0$
+
+则分类错误，$x_i$在分离超平面误分的一侧。
+
+以上就是对线性支持向量机中KKT条件的仔细讨论，从公式推导和几何意义上一同解释了为什么$\alpha_i^*与C$的大小关系决定支持向量的位置。
+
 ## 软间隔最大化时的支持向量
 
 在硬间隔最大化时，支持向量比较简单，就是满足$y_i(w^Tx_i + b) -1 =0$就可以了。根据KKT条件中的对偶互补条件$\alpha_{i}^{*}(y_i(w^Tx_i + b) - 1) = 0$，如果$\alpha_{i}^{*}>0$则有$y_i(w^Tx_i + b) =1$ 即点在支持向量上，否则如果$\alpha_{i}^{*}=0$则有$y_i(w^Tx_i + b) \geq 1$，即样本在支持向量上或者已经被正确分类。
@@ -307,7 +422,7 @@ $$K(x, z) = \phi(x) \bullet \phi(z)$$
 我们遇到线性不可分的样例时，常用做法是把样例特征映射到高维空间中去(如上一节的多项式回归)但是遇到线性不可分的样例，一律映射到高维空间，那么这个维度大小是会高到令人恐怖的。此时，核函数就体现出它的价值了，核函数的价值在于它虽然也是将特征进行从低维到高维的转换，但核函数好在它在低维上进行计算，而将实质上的分类效果（利用了内积）表现在了高维上，这样避免了直接在高维空间中的复杂计算，真正解决了SVM线性不可分的问题。
 ## 核函数的介绍
 
-事实上，核函数的研究非常的早，要比SVM出现早得多，当然，将它引入SVM中是最近二十多年的事情。对于从低维到高维的映射，核函数不止一个。那么什么样的函数才可以当做核函数呢？这是一个有些复杂的数学问题。这里不多介绍。由于一般我们说的核函数都是正定核函数，这里我们直说明正定核函数的充分必要条件。一个函数要想成为正定核函数，必须满足他里面任何点的集合形成的Gram矩阵是半正定的。也就是说,对于任意的$x_i \in \chi ， i=1,2,3...m$, $K(x_i,x_j)$对应的Gram矩阵$K = \bigg[ K(x_i, x_j )\bigg]$ 是半正定矩阵，则$K(x,z)$是正定核函数。　
+事实上，核函数的研究非常的早，要比SVM出现早得多，当然，将它引入SVM中是最近二十多年的事情。对于从低维到高维的映射，核函数不止一个。那么什么样的函数才可以当做核函数呢？这是一个有些复杂的数学问题。这里不多介绍。由于一般我们说的核函数都是正定核函数，这里我们只说明正定核函数的充分必要条件。一个函数要想成为正定核函数，必须满足他里面任何点的集合形成的Gram矩阵是半正定的。也就是说,对于任意的$x_i \in \chi ， i=1,2,3...m$, $K(x_i,x_j)$对应的Gram矩阵$K = \bigg[ K(x_i, x_j )\bigg]$ 是半正定矩阵，则$K(x,z)$是正定核函数。　
 
 从上面的定理看，它要求任意的集合都满足Gram矩阵半正定，所以自己去找一个核函数还是很难的，怎么办呢？还好牛人们已经帮我们找到了很多的核函数，而常用的核函数也仅仅只有那么几个。下面我们来看看常见的核函数, 选择这几个核函数介绍是因为scikit-learn中默认可选的就是下面几个核函数。
 3.1 线性核函数
@@ -319,7 +434,7 @@ $$K(x, z) = x \bullet z $$
 3.2 多项式核函数
 
 多项式核函数（Polynomial Kernel）是线性不可分SVM常用的核函数之一，表达式为：
-$$K(x, z) = （\gamma x \bullet z  + r)^d$$
+$$K(x, z) = (\gamma x \bullet z  + r)^d$$
 
 其中，$\gamma, r, d$都需要自己调参定义。
 3.3 高斯核函数
@@ -331,9 +446,16 @@ $$K(x, z) = exp(-\gamma||x-z||^2)$$
 3.4 Sigmoid核函数
 
 Sigmoid核函数（Sigmoid Kernel）也是线性不可分SVM常用的核函数之一，表达式为：
-$$K(x, z) = tanh（\gamma x \bullet z  + r)$$
+$$K(x, z) = tanh(\gamma x \bullet z  + r)$$
 
 其中，$\gamma, r$都需要自己调参定义。
+
+这里为双曲正切函数（tanh）是双曲正弦函数（sinh）与双曲余弦函数（cosh）的比值，其解析形式为：
+$$\tanh x=\frac{\sinh x}{\cosh x}=\frac{e^{x}-e^{-x}}{e^{x}+e^{-x}}$$
+sklearn里面的确就是这样子描述的。
+http://scikit-learn.org/stable/modules/svm.html#svm
+的确和我们普通的sigmoid函数不同。 
+
 ## 分类SVM的算法小结
 
 引入了核函数后，我们的SVM算法才算是比较完整了。现在我们对分类SVM的算法过程做一个总结。不再区别是否线性可分。
@@ -478,10 +600,10 @@ SMO算法称选择第二一个变量为内层循环，假设我们在外层循�
 ### 计算阈值b和差值$E_i$　
 
 在每次完成两个变量的优化之后，需要重新计算阈值b。当$0 < \alpha_{1}^{new} < C$时，我们有 
-$$y_1 - \sum\limits_{i=1}^{m}\alpha_iy_iK_{i1} -b_1 = 0 $$
+$$y_1 - (\sum\limits_{i=1}^{m}\alpha_iy_iK_{i1} +b_1) = 0 $$
 
 于是新的$b_1^{new}$为：
-$$b_1^{new} = y_1 - \sum\limits_{i=3}^{m}\alpha_iy_iK_{i1} - \alpha_{1}^{new}y_1K_{11} - \alpha_{2}^{new}y_2K_{21} $$
+$$b_1^{new} = y_1 - wx_1 = y_1 - \sum\limits_{i=3}^{m}\alpha_iy_iK_{i1} - \alpha_{1}^{new}y_1K_{11} - \alpha_{2}^{new}y_2K_{21} $$
 
 计算出$E_1$为：
 $$E_1 = g(x_1) - y_1 = \sum\limits_{i=3}^{m}\alpha_iy_iK_{i1} + \alpha_{1}^{old}y_1K_{11} + \alpha_{2}^{old}y_2K_{21} + b^{old} -y_1$$
@@ -566,7 +688,9 @@ $$\xi_i^{\lor} \geq 0, \;\; \xi_i^{\land} \geq 0 \;(i = 1,2,..., m)$$
 依然和SVM分类模型相似，我们可以用拉格朗日函数将目标优化函数变成无约束的形式，也就是拉格朗日函数的原始形式如下：
 
 
-$$L(w,b,\alpha^{\lor}, \alpha^{\land}, \xi_i^{\lor}, \xi_i^{\land}, \mu^{\lor}, \mu^{\land}) = \frac{1}{2}||w||_2^2 + C\sum\limits_{i=1}^{m}(\xi_i^{\lor}+ \xi_i^{\land}) + \sum\limits_{i=1}^{m}\alpha^{\lor}(-\epsilon - \xi_i^{\lor} -y_i + w \bullet \phi(x_i) + b) + \sum\limits_{i=1}^{m}\alpha^{\land}(y_i - w \bullet \phi(x_i ) - b -\epsilon - \xi_i^{\land}) - \sum\limits_{i=1}^{m}\mu^{\lor}\xi_i^{\lor} - \sum\limits_{i=1}^{m}\mu^{\land}\xi_i^{\land}$$
+$$L(w,b,\alpha^{\lor}, \alpha^{\land}, \xi_i^{\lor}, \xi_i^{\land}, \mu^{\lor}, \mu^{\land}) = \frac{1}{2}||w||_2^2 + C\sum\limits_{i=1}^{m}(\xi_i^{\lor}+ \xi_i^{\land})\\
++\sum\limits_{i=1}^{m}\alpha^{\lor}(-\epsilon - \xi_i^{\lor} -y_i + w \bullet \phi(x_i) + b) + \sum\limits_{i=1}^{m}\alpha^{\land}(y_i - w \bullet \phi(x_i ) - b -\epsilon - \xi_i^{\land}) \\
+-\sum\limits_{i=1}^{m}\mu^{\lor}\xi_i^{\lor} - \sum\limits_{i=1}^{m}\mu^{\land}\xi_i^{\land}$$
 
 其中 $\mu^{\lor} \geq 0, \mu^{\land} \geq 0, \alpha_i^{\lor} \geq 0, \alpha_i^{\land} \geq 0$,均为拉格朗日系数。
 ## SVM回归模型的目标函数的对偶形式
