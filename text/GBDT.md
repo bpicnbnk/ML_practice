@@ -52,7 +52,7 @@ Gradient Boosting Decision Tree，梯度提升树
 
 损失函数是$L(y,f_{t−1}(x))$
 
-我们本轮迭代的目标是找到一个弱学习器$h_t(x)$,最小化让本轮的损失$L(y,ft(x))=L(y,ft−1(x)+ht(x))$
+我们本轮迭代的目标是找到一个弱学习器$h_t(x)$,最小化让本轮的损失$L(y,f_t(x))=L(y,f_{t−1}(x)+h_t(x))$
 
 当采用平方损失函数时：
 $$\begin{array}{c}
