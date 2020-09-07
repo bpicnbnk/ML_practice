@@ -39,13 +39,17 @@ $$H(X | Y)=-\sum_{i=1}^{n} p\left(x_{i}, y_{i}\right) \log p\left(x_{i} | y_{i}\
 
 $$I(X,Y)=H(X)-H(X|Y)$$
 
+# 特征属性示例图：
+
+![](../pic/C4.5_watermelon_dataset.jpg)
 # ID3
 [链接](https://www.cnblogs.com/pinard/p/6050306.html)
 
 1970年代，昆兰的大牛找到了用信息论中的熵来度量决策树的决策选择过程，这个算法叫做ID3。
 
 用信息增益大小来判断当前节点应该用什么特征来构建决策树，用计算出的信息增益最大的特征来建立决策树的当前节点。
-
+$$Ent(D)=-\sum_{i=1}^{|Y|} p_{i} \log p_{i}$$
+$$\operatorname{Gain}(D, a)=\operatorname{Ent}(D)-\sum_{v=1}^{V} \frac{\left|D^{v}\right|}{|D|} \operatorname{Ent}\left(D^{v}\right)$$
 注：选取某个特征作为结点的时候，可以不用计算经验熵H(D),只要计算经验条件熵H(D|A)，只需要求经验条件熵最小的值就可以
 
 ## 不足
@@ -67,7 +71,9 @@ ID3算法有四个主要的不足，一是不能处理连续特征，第二个�
 
 1. 对于第一个问题，不能处理连续特征， C4.5的思路是将连续的特征离散化。比如m个样本的连续特征A有m个，从小到大排列为${a_1,a_2,...,a_m}$,则C4.5取相邻两样本值的平均数，一共取得m-1个划分点，其中第i个划分点$T_i表示$为：$T_i = \frac{a_i+a_{i+1}}{2}$。对于这m-1个点，分别计算以该点作为二元分类点时的信息增益。选择信息增益最大的点作为该连续特征的二元离散分类点。比如取到的增益最大的点为$a_t$,则小于$a_t$的值为类别1，大于$a_t$的值为类别2，这样我们就做到了连续特征的离散化。要注意的是，与离散属性不同的是，如果当前节点为连续属性，则该属性后面还可以参与子节点的产生选择过程。
 
-2. 对于第二个问题，信息增益作为标准容易偏向于取值较多的特征的问题。我们引入一个信息增益比的变量$I_R(X,Y)$，它是信息增益和**特征熵**的比值。表达式如下：
+2. 对于第二个问题，信息增益作为标准容易偏向于取值较多的特征的问题。我们引入一个信息增益比的变量$I_R(X,Y)$，它是信息增益（互信息）和**特征熵**的比值。表达式如下：
+   $$Ent(D)=-\sum_{i=1}^{|Y|} p_{i} \log p_{i}$$
+   $$\operatorname{Gain}(D, a)=\operatorname{Ent}(D)-\sum_{v=1}^{V} \frac{\left|D^{v}\right|}{|D|} \operatorname{Ent}\left(D^{v}\right)$$
 
    $$I_R(D,A) = \frac{I(A,D)}{H_A(D)}$$
 
@@ -75,7 +81,7 @@ ID3算法有四个主要的不足，一是不能处理连续特征，第二个�
 
    $$H_A(D) = -\sum\limits_{i=1}^{n}\frac{|D_i|}{|D|}log_2\frac{|D_i|}{|D|}$$
 
-   其中n为特征A的类别数， $D_i$为特征A的第i个取值对应的样本个数。$|D|$为样本个数。
+   其中**n为特征A的类别数，$D_i$为特征A的第i个取值对应的样本个数。**$|D|$为样本个数。
 
    特征数越多的特征对应的特征熵越大，它作为分母，可以校正信息增益容易偏向于取值较多的特征的问题。
 
@@ -87,7 +93,35 @@ ID3算法有四个主要的不足，一是不能处理连续特征，第二个�
    
       简单来说：**对于有缺失值的属性，其信息增益就是无缺失值样本所占的比例乘以无缺失值样本子集的信息增益。**
 
-   2. 对于第二个子问题，可以将缺失特征的样本同时划分入所有的子节点，不过将**该样本的权重按各个子节点样本的数量比例来分配**。比如缺失特征A的样本a之前权重为1，特征A有3个特征值A1,A2,A3。 3个特征值对应的无缺失A特征的样本个数为2,3,4.则a同时划分入A1，A2，A3。对应权重调节为2/9,3/9, 4/9。
+      示例（参考上图）：
+
+      色泽：
+      $$\operatorname{Ent}(\tilde{D})=-\left(\frac{6}{14} \log _{2} \frac{6}{14}+\frac{8}{14} \log _{2} \frac{8}{14}\right)=0.985$$
+      另 $\tilde{D}^{1}, \tilde{D}^{2}, \tilde{D}^{3}$ 分别表示 "色泽" 属性上取值为 “青绿"、乌黑"、"浅白" 的样本子集。
+      $$\operatorname{Ent}\left(\tilde{D}^{1}\right)=-\left(\frac{2}{4} \log _{2} \frac{2}{4}+\frac{2}{4} \log _{2} \frac{2}{4}\right)=1$$
+      $$\operatorname{Ent}\left(\tilde{D}^{2}\right)=-\left(\frac{4}{6} \log _{2} \frac{4}{6}+\frac{2}{6} \log _{2} \frac{2}{6}\right)=0.918$$
+      $$\operatorname{Ent}\left(\tilde{D}^{3}\right)=-\left(\frac{0}{4} \log _{2} \frac{0}{4}+\frac{4}{4} \log _{2} \frac{4}{4}\right)=0$$
+      $$\operatorname{Gain}(\tilde{D}, a)=0.985-\left(\frac{4}{14} \times 1+\frac{6}{14} \times 0.918+\frac{4}{14} \times 0\right)=0.306$$
+      $$\operatorname{Gain}(D, a)=\rho \times \operatorname{Gain}(\tilde{D}, a)=\frac{14}{17} \times 0.306=0.252$$
+
+   1. 对于第二个子问题，可以将缺失特征的样本同时划分入所有的子节点，不过将**该样本的权重按各个子节点样本的数量比例来分配**。比如缺失特征A的样本a之前权重为1，特征A有3个特征值A1,A2,A3。 3个特征值对应的无缺失A特征的样本个数为2,3,4.则a同时划分入A1，A2，A3。对应权重调节为2/9,3/9, 4/9。
+   
+      下面我们再以“纹理=清晰”这个分支为例(缺失值当作清晰，权重为分数，小于1)，看看下一步将如何划分：
+      ![](../pic/C4.5_feature_value.jpg)
+      $$\begin{aligned}
+      &\text { 色泽： }\\
+      &\rho=\frac{\sum_{x \in \bar{D}} w_{x}}{\sum_{x \in D} w_{x}}=\frac{5+2 \times \frac{7}{15}}{7+2 \times \frac{7}{15}}=0.748\\
+      &\tilde{p}_{1}=\frac{\sum_{x \in \bar{D}_{1}} w_{x}}{\sum_{x \in \bar{D}} w_{x}}=\frac{4+\frac{7}{15}}{5+2 \times \frac{7}{15}}=0.753 （无缺失值样本中，好瓜的比例）\\
+      &\tilde{p}_{2}=\frac{\sum_{x \in \bar{D}_{2}} w_{x}}{\sum_{x \in \bar{D}} w_{x}}=\frac{1+\frac{7}{15}}{5+2 \times \frac{7}{15}}=0.247 （无缺失值样本中，坏瓜的比例）\\
+      &\tilde{r}_{1}=\frac{\sum_{x \in \bar{D}^{1}} w_{x}}{\sum_{x \in \bar{D}} w_{x}}=\frac{3+\frac{7}{15}}{5+2 \times \frac{7}{15}}=0.584 （无缺失值样本中，“色泽=乌黑”的样本的比例）\\
+      &\tilde{r}_{2}=\frac{\sum_{x \in \bar{D}^{2}} w_{x}}{\sum_{x \in \bar{D}} w_{x}}=\frac{2+\frac{7}{15}}{5+2 \times \frac{7}{15}}=0.416 （无缺失值样本中，“色泽=青绿”的样本的比例）\\
+      &\operatorname{Ent}(\tilde{D})=-\sum_{k=1}^{|Y|} \tilde{p}_{k} \log _{2} \tilde{p}_{k}=-0.753 \times \log _{2} 0.753-0.247 \times \log _{2} 0.247=0.806\\
+      &\frac{7}{15}=0.467\\
+      &\operatorname{Ent}\left(\tilde{D}^{1}\right)=-\left(\frac{2.467}{3.467} \log _{2} \frac{2.467}{3.467}+\frac{1}{3.467} \log _{2} \frac{1}{3.467}\right)=0.867 \quad \text (  \text { "色泽=乌黑"中有1个不是好瓜（权重为1）})\\
+      &\operatorname{Ent}\left(\tilde{D}^{2}\right)=-\left(\frac{2}{2.467} \log _{2} \frac{2}{2.467}+\frac{0.467}{2.467} \log _{2} \frac{0.467}{2.467}\right)=0.700 \quad(\text { "色泽=青绿" })\\
+      &\operatorname{Gain}(D, a)=\rho \times\left(\operatorname{Ent}(\tilde{D})-\sum_{v=1}^{V} \tilde{r}_{v} \operatorname{Ent}\left(\tilde{D}^{v}\right)\right)\\
+      &=0.748 \times(0.806-0.584 \times 0.867-0.416 \times 0.700)=0.006
+      \end{aligned}$$
 
 4. 对于第4个问题，C4.5引入了正则化系数进行初步的剪枝。
    
