@@ -17,12 +17,14 @@ H(X)=-\sum_{k=1}^{K} p_{k} \ln p_{k} \\
 \end{array}\right.$$
 
 将 f(x)=−lnx 在 x=1 处进行一阶泰勒展开（忽略高阶无穷小）：
+
 $$\begin{aligned}
 f(x) &=f\left(x_{0}\right)+f^{\prime}\left(x_{0}\right)\left(x-x_{0}\right)+o(\cdot) \\
 &=f(1)+f^{\prime}(1)(x-1)+o(\cdot) \\
 &=1-x
 \end{aligned}$$
 因此，熵可近似转化为：
+
 $$\begin{aligned}
 H(X)=&-\sum_{k=1}^{K} p_{k} \ln p_{k}=\sum_{k=1}^{K} p_{k}\left(-\ln p_{k}\right) \\
 & \simeq \sum_{k=1}^{K} p_{k}\left(1-p_{k}\right)=\operatorname{Gini}(X)
